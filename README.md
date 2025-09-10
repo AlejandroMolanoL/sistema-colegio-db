@@ -200,4 +200,4 @@ Los siguientes casos de prueba verifican que la base de datos se inicialice corr
 
 ## 📝 Conclusiones de la Prueba
 
-Todas las pruebas se completaron con éxito.s
+Todas las pruebas se completaron con éxito.
