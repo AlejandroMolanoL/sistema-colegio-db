@@ -1,5 +1,3 @@
-
-
 version: '3.8'
 
 services:
@@ -7,14 +5,16 @@ services:
     image: mysql:8.0
     container_name: mysql_colegio
     restart: always
+    # Se una env_file en lugar de variables directas para la consistencia
     env_file:
       - .env.mysql
     ports:
       - "3306:3306"
     volumes:
-      - ./db/mysql:/docker-entrypoint-initdb.d
+        - ./db/mysql/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+        - ./db/mysql/data.sql:/tmp/data.sql
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -28,7 +28,8 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./db/postgres:/docker-entrypoint-initdb.d
+      - ./db/postgres/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ./db/postgres/data.sql:/tmp/data.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -43,9 +44,13 @@ services:
       - .env.oracle
     ports:
       - "1521:1521"
-      - "5500:5500" # Puerto para Oracle APEX/Enterprise Manager
+      - "5500:5500"
     healthcheck:
-      test: ["CMD", "sqlplus", "system/Oracle123", "@scripts/healthcheck.sql"]
+      test: ["CMD", "sqlplus", "system/$ORACLE_PASSWORD", "@scripts/healthcheck.sql"]
       interval: 10s
       timeout: 60s
       retries: 5
+    volumes:
+      - ./db/oracle/schema.sql:/opt/oracle/scripts/startup/schema.sql
+      - ./db/oracle/data.sql:/tmp/data.sql
+      - ./scripts/oracle-init.sh:/opt/oracle/scripts/startup/oracle-init.sh #
