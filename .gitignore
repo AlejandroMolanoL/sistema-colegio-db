@@ -1,0 +1,14 @@
+
+touch .gitignore
+
+
+.DS_Store
+Thumbs.db
+
+# Ignorar archivos de configuración de Docker
+docker-compose.override.yml
+*.env
+
+# Ignorar archivos de logs y temporales
+*.log
+temp/
