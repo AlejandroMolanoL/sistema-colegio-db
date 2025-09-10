@@ -98,3 +98,106 @@ cp .env.oracle.example .env.oracle
 ``` docker-compose down ```
 
 
+# 🧪 Documentación de Pruebas de la Base de Datos
+
+
+## 🎯 Objetivo de la Prueba
+
+El objetivo principal es asegurar que los scripts de esquema (`schema.sql`) y de datos (`data.sql`) se ejecuten sin errores en cada motor de base de datos (MySQL, PostgreSQL, OracleDB), creando la estructura de tablas con datos de prueba realistas de forma automática.
+
+## 📋 Entorno de Prueba
+
+* **Sistema Operativo:** macOS, Windows, Linux
+* **Docker Desktop:** Versión 4.x.x
+* **Motores de Base de Datos:**
+    * MySQL 8.0
+    * PostgreSQL 15
+    * Oracle-Free 23.4
+* **Herramienta de Conexión:** DBeaver, MySQL Workbench, pgAdmin, SQL Developer.
+
+## ✅ Casos de Prueba
+
+Los siguientes casos de prueba verifican que la base de datos se inicialice correctamente y que los datos se inserten según lo esperado.
+
+---
+
+### **Caso de Prueba 1: Inicialización de la Estructura de la Base de Datos**
+
+* **Descripción:** Verificar que las tablas `estudiantes`, `profesores`, `cursos`, `clases`, `inscripciones` y `notas` se creen sin errores para cada motor de base de datos.
+* **Pasos de Prueba:**
+    1.  Ejecutar `docker-compose up -d`.
+    2.  Esperar a que todos los servicios estén en estado `healthy`.
+    3.  Conectarse a cada base de datos con un cliente.
+    4.  Ejecutar la consulta `SHOW TABLES;` (para MySQL), `\dt` (para PostgreSQL) o `SELECT table_name FROM user_tables;` (para Oracle).
+* **Resultado Esperado:** Todas las tablas de la base de datos del colegio deben listarse sin errores de sintaxis.
+
+---
+
+### **Caso de Prueba 2: Inserción de Datos Semilla**
+
+* **Descripción:** Verificar que los scripts de datos (`data.sql`) inserten el número esperado de registros aleatorios en cada tabla.
+* **Pasos de Prueba:**
+    1.  Asegurarse de que los contenedores estén levantados y los scripts de datos hayan sido ejecutados (`./init.sh`).
+    2.  Conectarse a cada base de datos.
+    3.  Ejecutar las siguientes consultas para verificar el conteo de registros:
+        * `SELECT COUNT(*) FROM estudiantes;`
+        * `SELECT COUNT(*) FROM profesores;`
+        * `SELECT COUNT(*) FROM cursos;`
+        * `SELECT COUNT(*) FROM clases;`
+        * `SELECT COUNT(*) FROM inscripciones;`
+        * `SELECT COUNT(*) FROM notas;`
+* **Resultados Esperados:**
+    * **estudiantes:** 20 registros
+    * **profesores:** 5 registros
+    * **cursos:** 5 registros
+    * **clases:** 10 registros
+    * **inscripciones:** 40 registros
+    * **notas:** 40 registros
+
+---
+
+### **Caso de Prueba 3: Verificación de Integridad de Datos**
+
+* **Descripción:** Validar que las claves foráneas y la lógica de generación de datos funcionen correctamente, asegurando que los datos sean coherentes entre las tablas.
+* **Pasos de Prueba:**
+    1.  Conectarse a cada base de datos.
+    2.  Ejecutar consultas `JOIN` para verificar la relación entre las tablas.
+* **Consultas de Ejemplo:**
+    * **MySQL & PostgreSQL:**
+        ```sql
+        -- Obtener el nombre de los estudiantes y el curso en el que están inscritos
+        SELECT 
+            e.nombre,
+            e.apellido,
+            c.nombre AS curso
+        FROM 
+            estudiantes e
+        JOIN 
+            inscripciones i ON e.estudiante_id = i.estudiante_id
+        JOIN 
+            clases cl ON i.clase_id = cl.clase_id
+        JOIN
+            cursos c ON cl.curso_id = c.curso_id;
+        ```
+    * **Oracle:**
+        ```sql
+        -- Obtener el nombre de los estudiantes y el curso en el que están inscritos
+        SELECT 
+            e.nombre,
+            e.apellido,
+            c.nombre AS curso
+        FROM 
+            estudiantes e
+        JOIN 
+            inscripciones i ON e.estudiante_id = i.estudiante_id
+        JOIN 
+            clases cl ON i.clase_id = cl.clase_id
+        JOIN
+            cursos c ON cl.curso_id = c.curso_id;
+        ```
+* **Resultado Esperado:** La consulta debe devolver una lista de estudiantes con los cursos a los que están inscritos, confirmando que las relaciones entre las tablas funcionan.
+* **Estado:** **PASA**
+
+## 📝 Conclusiones de la Prueba
+
+Todas las pruebas se completaron con éxito.s
