@@ -54,13 +54,13 @@ La estructura del proyecto está organizada para mantener separados los scripts 
 ├── db/
 │   ├── mysql/
 │   │   ├── schema.sql
-│   │   └── data.sql (Opcional)
+│   │   └── data.sql
 │   ├── postgres/
 │   │   ├── schema.sql
-│   │   └── data.sql (Opcional)
+│   │   └── data.sql
 │   └── oracle/
 │       ├── schema.sql
-│       └── data.sql (Opcional)
+│       └── data.sql
 ├── .env.mysql
 ├── .env.postgres
 ├── .env.oracle
